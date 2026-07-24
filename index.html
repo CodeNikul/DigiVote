@@ -557,7 +557,13 @@ let selectedParty = "";
 let currentVoter = "";
 
 
-let votes = {
+/* LOAD SAVED VOTES */
+
+let votes = JSON.parse(
+
+    localStorage.getItem("digitalVotingVotes")
+
+) || {
 
 
     "Bharatiya Janata Party (BJP)": 0,
@@ -571,8 +577,16 @@ let votes = {
 };
 
 
-let votedIDs = [];
+/* LOAD VOTER IDs */
 
+let votedIDs = JSON.parse(
+
+    localStorage.getItem("digitalVotingVoters")
+
+) || [];
+
+
+/* START VOTING */
 
 function startVoting() {
 
@@ -583,7 +597,9 @@ function startVoting() {
 
         .value
 
-        .trim();
+        .trim()
+
+        .toUpperCase();
 
 
     if (voterID === "") {
@@ -640,6 +656,8 @@ function startVoting() {
 }
 
 
+/* SELECT PARTY */
+
 function selectParty(partyName, element) {
 
 
@@ -679,6 +697,8 @@ function selectParty(partyName, element) {
 }
 
 
+/* CAST VOTE */
+
 function castVote() {
 
 
@@ -699,10 +719,34 @@ function castVote() {
     }
 
 
+    /* ADD VOTE */
+
     votes[selectedParty]++;
 
 
+    /* SAVE VOTER ID */
+
     votedIDs.push(currentVoter);
+
+
+    /* SAVE DATA */
+
+    localStorage.setItem(
+
+        "digitalVotingVotes",
+
+        JSON.stringify(votes)
+
+    );
+
+
+    localStorage.setItem(
+
+        "digitalVotingVoters",
+
+        JSON.stringify(votedIDs)
+
+    );
 
 
     document
@@ -757,9 +801,10 @@ function castVote() {
 
     }, 1500);
 
-
 }
 
+
+/* UPDATE RESULTS */
 
 function updateResults() {
 
@@ -769,9 +814,7 @@ function updateResults() {
 
     for (let party in votes) {
 
-
         totalVotes += votes[party];
-
 
     }
 
@@ -835,7 +878,6 @@ function updateResults() {
 
         winner = Object.keys(votes)
 
-
             .reduce(function(a, b) {
 
 
@@ -845,9 +887,7 @@ function updateResults() {
 
                     : b;
 
-
             });
-
 
     }
 
@@ -879,9 +919,10 @@ function updateResults() {
 
         .innerHTML = html;
 
-
 }
 
+
+/* SHOW SAVED RESULTS ON PAGE LOAD */
 
 updateResults();
 
